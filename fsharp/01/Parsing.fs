@@ -1,15 +1,23 @@
 module CalorieCounting.Parsing
 
-let private foldIntoSums (sums:int list) (line:string) : int list =
+let private foldIntoSumPerElf (sums:int list) (line:string) : int list =
     match line with
-    | "" -> 0 :: sums
+    | "" -> 0 :: sums // Empty line starts a new elf
     | _ -> 
         match sums with
         | [] -> [int line]
-        | x::xs -> (x + int line) :: xs
+        | currentSum::finishedSums -> (currentSum + int line) :: finishedSums
 
-let private determineSums (lines:string list): int list =
-    List.fold foldIntoSums [] lines
+let private determineSumPerElf (lines:string list): int list =
+    List.fold foldIntoSumPerElf [] lines
 
+// Part One
 let getMaxCalories (lines:string list): int =
-    (determineSums lines) |> List.max
+    (determineSumPerElf lines) |> List.max
+
+// Part Two
+let getSumOfTopCalories (lines:string list) (take:int): int =
+    (determineSumPerElf lines)
+    |> List.sortDescending
+    |> List.take take
+    |> List.sum
