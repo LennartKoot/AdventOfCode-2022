@@ -20,5 +20,9 @@ let realInput = loadInput "data/input.txt"
 let realRounds = convertInputToRounds realInput
 
 printfn "Part One"
-printfn "Example Data: %A" (determineTotalScore exampleRounds)
-printfn "Real Data: %A" (determineTotalScore realRounds)
+printfn "Example Data: %A" (determineTotalScore (exampleRounds SecondColumn.PlayerShape))
+printfn "Real Data: %A" (determineTotalScore (realRounds SecondColumn.PlayerShape))
+
+printfn "Part Two"
+printfn "Example Data: %A" (determineTotalScore (exampleRounds SecondColumn.RoundOutcome))
+printfn "Real Data: %A" (determineTotalScore (realRounds SecondColumn.RoundOutcome))

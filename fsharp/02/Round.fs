@@ -7,6 +7,11 @@ exception InputError of string
 
 type Round = { Opponent:Shape; Player:Shape }
 
+// Enum to switch between Part One and Part Two
+type SecondColumn =
+    | PlayerShape = 1
+    | RoundOutcome = 2
+
 let private determineOpponentShape (column:string) =
     match column with
     | "A" -> Rock
@@ -14,24 +19,45 @@ let private determineOpponentShape (column:string) =
     | "C" -> Scissor
     | _ -> raise (InputError $"Unknown shape value '{column}' encounterd")
 
-let private determinePlayerShape (column:string) =
+let private determinePlayerShapePartOne (column:string) =
     match column with
     | "X" -> Rock
     | "Y" -> Paper
     | "Z" -> Scissor
     | _ -> raise (InputError $"Unknown shape value '{column}' encounterd")
 
-let private foldLineToRounds (rounds:Round list) (line: string) : Round list =
+let private determinePlayerShapeByOutcome (opponent: Shape) (outcome: Outcome) =
+    match (opponent, outcome) with
+    | (Rock, Win) -> Paper
+    | (Rock, Loss) -> Scissor
+    | (Rock, Draw) -> Rock
+    | (Paper, Win) -> Scissor
+    | (Paper, Loss) -> Rock
+    | (Paper, Draw) -> Paper
+    | (Scissor, Win) -> Rock
+    | (Scissor, Loss) -> Paper
+    | (Scissor, Draw) -> Scissor
+
+let private determinePlayerShapePartTwo (column:string) (opponent:Shape) =
+    let f = determinePlayerShapeByOutcome opponent
+    match column with
+    | "X" -> f Loss
+    | "Y" -> f Draw
+    | "Z" -> f Win
+    | _ -> raise (InputError $"Unknown shape value '{column}' encounterd")
+
+let private foldLineToRounds (secondColumn: SecondColumn) (rounds:Round list) (line: string) : Round list =
     let columns = line.Split ' '
-    let opponent = columns[0]
-    let player = columns[1]
-    let opponentShape = determineOpponentShape opponent
-    let playerShape = determinePlayerShape player
+    let opponentShape = determineOpponentShape columns[0]
+    let playerShape =
+        match secondColumn with
+        | SecondColumn.PlayerShape -> determinePlayerShapePartOne columns[1]
+        | SecondColumn.RoundOutcome -> determinePlayerShapePartTwo columns[1] opponentShape
+        | _ -> raise (InputError $"Unknown value {secondColumn} for secondColumnMeaning")
     { Opponent = opponentShape; Player = playerShape } :: rounds
 
-
-let convertInputToRounds (lines:string array) =
-    Array.fold foldLineToRounds [] lines
+let convertInputToRounds (lines:string array) (secondColumn: SecondColumn) =
+    Array.fold (foldLineToRounds secondColumn) [] lines
 
 let determineRoundOutcome (round: Round) =
     match round with
