@@ -13,13 +13,24 @@ let calculatePrioritiesSum (duplicates: Set<char> array): int =
     |> Array.fold (fun sum items -> sum + (foldIntoSum calculateItemPriority items)) 0
 
 let exampleInput = loadInput "data/example.txt"
+let realInput = loadInput "data/input.txt"
+
 let exampleDuplicateItems = determineDuplicateItems exampleInput
 let exampleSum = calculatePrioritiesSum exampleDuplicateItems
 
-let realInput = loadInput "data/input.txt"
 let realDuplicateItems = determineDuplicateItems realInput
 let realSum = calculatePrioritiesSum realDuplicateItems
 
 printfn "Part One"
 printfn "Example Data: %A" exampleSum
 printfn "Real Data: %A" realSum
+
+let exampleGroupBadges = determineGroupBadges exampleInput
+let exampleBadgesPrioritiesSum = calculatePrioritiesSum exampleGroupBadges
+
+let realGroupBadges = determineGroupBadges realInput
+let realBadgesPrioritiesSum = calculatePrioritiesSum realGroupBadges
+
+printfn "Part Two"
+printfn "Example Data: %A" exampleBadgesPrioritiesSum
+printfn "Real Data: %A" realBadgesPrioritiesSum
