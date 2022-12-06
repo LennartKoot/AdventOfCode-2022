@@ -21,3 +21,17 @@ printfn "Part one"
 printfn "Example Data: %A" exampleCountContainedRanges
 printfn "Real Data: %A" realCountContainedRanges
 printfn ""
+
+let assignmentOverlapsOther (pair:Pair) =
+    pair.left.overlaps pair.right
+
+let countOverlappingRanges pairs =
+    pairs |> Seq.filter assignmentOverlapsOther |> Seq.length
+
+let exampleCountOverlappingRanges = countOverlappingRanges examplePairs
+let realCountOverlappingRanges = countOverlappingRanges realPairs
+
+printfn "Part two"
+printfn "Example Data: %A" exampleCountOverlappingRanges
+printfn "Real Data: %A" realCountOverlappingRanges
+printfn ""
