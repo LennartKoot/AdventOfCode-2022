@@ -7,7 +7,8 @@ type Assigment = { lowerboundSection: int; upperboundSection: int } with
         this.lowerboundSection <= a.lowerboundSection &&
         this.upperboundSection >= a.upperboundSection
     member public this.overlaps (a:Assigment) =
-        this.upperboundSection >= a.lowerboundSection
+        this.upperboundSection >= a.lowerboundSection &&
+        this.lowerboundSection <= a.upperboundSection 
 
 let parseAssignment (s:string) =
     splitIntoTwoAndApply s '-' (fun x y -> { lowerboundSection = (int x); upperboundSection = (int y)})
