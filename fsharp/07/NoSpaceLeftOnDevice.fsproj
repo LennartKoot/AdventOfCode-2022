@@ -4,8 +4,9 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Input.fs" />
     <Compile Include="FileSystem.fs" />
+    <Compile Include="FileSystemFoldAlgebra.fs" />
+    <Compile Include="Input.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
