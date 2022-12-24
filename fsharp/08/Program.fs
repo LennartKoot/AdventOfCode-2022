@@ -5,35 +5,27 @@ let forestMatrix dataLocation =
     |> Seq.map (Seq.map (string >> int))
     |> array2D
 
-let isVisible row column (matrix: int[,]) =
+let mapDirections fDirection fCombine edgeValue row column (matrix: int[,]) =
     let treeHeight = matrix[row,column]
     let maxColumn = matrix[row,*].Length - 1
     let maxRow = matrix[*,column].Length - 1
     
     match row, column with
-    | 0, _                          -> true
-    | _, 0                          -> true
-    | r,_ when r = maxRow  -> true
-    | _,c when c = maxColumn -> true
+    | 0, _                          -> edgeValue
+    | _, 0                          -> edgeValue
+    | r,_ when r = maxRow  -> edgeValue
+    | _,c when c = maxColumn -> edgeValue
     | _ ->
-        let checkSlice slice =
-            slice
-            |> Array.max 
-            |> (>) treeHeight
-
-        let visibleFromLeft (matrix:int[,]) =
-            matrix[row,0 .. column - 1] |> checkSlice
-        let visibleFromRight (matrix:int[,]) =
-            matrix[row,column + 1 .. maxColumn] |> checkSlice
-        let visibleFromTop (matrix:int[,]) =
-            matrix[0 .. row - 1, column] |> checkSlice
-        let visibleFromBottom (matrix:int[,]) = 
-            matrix[row + 1 .. maxRow, column] |> checkSlice
+        let left (matrix:int[,]) =
+            matrix[row,0 .. column - 1] |> fDirection treeHeight
+        let right (matrix:int[,]) =
+            matrix[row,column + 1 .. maxColumn] |> fDirection treeHeight
+        let top (matrix:int[,]) =
+            matrix[0 .. row - 1, column] |> fDirection treeHeight
+        let bottom (matrix:int[,]) = 
+            matrix[row + 1 .. maxRow, column] |> fDirection treeHeight
         
-        visibleFromLeft matrix ||
-        visibleFromRight matrix ||
-        visibleFromTop matrix ||
-        visibleFromBottom matrix
+        fCombine (left matrix) (right matrix) (top matrix) (bottom matrix)
 
 let fold (folder: 'S -> 'T -> 'S) (state: 'S) (array: 'T[,]) =
     seq {
@@ -42,6 +34,11 @@ let fold (folder: 'S -> 'T -> 'S) (state: 'S) (array: 'T[,]) =
                 yield (array.[x, y])
     }
     |> Seq.fold (fun acc e -> folder acc e) state
+
+let isVisible =
+    let fDirection treeHeight trees = trees |> Array.max |> (>) treeHeight
+    let fCombine left right top bottom = left || right || top || bottom
+    mapDirections fDirection fCombine true
 
 let partOne dataLocation =
     let matrix = forestMatrix dataLocation
