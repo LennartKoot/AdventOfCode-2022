@@ -32,24 +32,43 @@ let flatten fFile fDirectory (trees: ItemTreeWithDirectorySize list) =
                 | None -> subFlattened
     trees |> List.map (flattenTree []) |> List.collect id
 
-let flattenAndFilterDirectories maxSize =
+let flattenAndFilterDirectories sizeFilter =
     let fFile f = None
     let fDirectory (d,size) =
         match size with
-        | s when size < maxSize -> Some s
+        | s when sizeFilter size -> Some s
         | _ -> None
     flatten fFile fDirectory
 
-printfn "Part one (example): %A" <| ( 
-    filesystem "data/example.txt" 
+let partOne data =
+    filesystem data 
     |> determineDirectorySizes
-    |> flattenAndFilterDirectories 100000
+    |> flattenAndFilterDirectories (fun s -> s < 100000)
     |> List.sum
-)
 
-printfn "Part one (real): %A" <| ( 
-    filesystem "data/input.txt" 
+printfn "Part one (example): %A" <| partOne "data/example.txt"
+printfn "Part one (real): %A" <| partOne "data/input.txt"
+
+// Part two
+let determineTotalSize =
+    let fFile (_, size) = size
+    let fDirectory (_, subSizes) = List.sum subSizes
+    let fFileSystem roots = List.sum roots
+    fold fFile fDirectory fFileSystem
+
+let partTwo data =
+    let totalDiskSpace = 70000000
+    let requiredFreeDiskSpace = 30000000
+    let filesystem = filesystem data
+    let minDeleteSize =
+        filesystem
+        |> determineTotalSize
+        |> (-) totalDiskSpace
+        |> (-) requiredFreeDiskSpace
+    filesystem
     |> determineDirectorySizes
-    |> flattenAndFilterDirectories 100000
-    |> List.sum
-)
+    |> flattenAndFilterDirectories (fun s -> s >= minDeleteSize)
+    |> List.min
+
+printfn "Part two (example): %A" <| partTwo "data/example.txt"
+printfn "Part two (real): %A" <| partTwo "data/input.txt"
