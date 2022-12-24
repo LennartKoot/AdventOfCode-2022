@@ -1,16 +1,19 @@
 ﻿open NoSpaceLeftOnDevice.Input
+open NoSpaceLeftOnDevice.FileSystem
 open NoSpaceLeftOnDevice.FileSystemFoldAlgebra
 
-let exampleInput = loadInput "data/example.txt"
-let filesystem = NoSpaceLeftOnDevice.FileSystem.create exampleInput
+let filesystem = create << loadInput
 
-// Simple fold to test fold algebra
-let totalFileSystemSize =
-    let fFile ((_, size)) = size
-    let fDirectory ((_, subSizes)) = List.sum subSizes
-    let fFileSystem rootSizes = List.sum rootSizes
-    fold fFile fDirectory fFileSystem
+// Part one
+type ItemTreeWithDirectorySize =
+    | File of File
+    | Directory of Directory * int * ItemTreeWithDirectorySize list
 
-printfn "Total sum: %A | Expected: 48381165" (filesystem |> totalFileSystemSize)
+let determineDirectorySizes =
+    let fFile = File
+    let fDirectory (dir, subTrees) = 
+        let sumBy = function | File (_,size) -> size | Directory (_,size,_) -> size
+        Directory (dir, subTrees |> List.sumBy sumBy, subTrees)
+    foldUpToRoots fFile fDirectory
 
-printfn "%A" filesystem
+printfn "FileSystem with directory sizes: %A" <| (filesystem "data/example.txt" |> determineDirectorySizes)
