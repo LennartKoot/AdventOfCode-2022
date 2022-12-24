@@ -1,15 +1,13 @@
 module NoSpaceLeftOnDevice.FileSystem
 
-type Item =
-    | Directory of Directory
+type Directory = string
+type File = string * int
+type ItemTree = 
     | File of File
+    | Directory of (Directory * ItemTree list)
+type FileSystem = ItemTree list
 
-and Directory = { Name: string; SubItems: Item list }
-and File = { Name: string; Size: int }
-
-type FileSystem = FileSystem of Directory
-
-type private LineType =
+type private Line =
     | CdParentDirectory
     | CdDirectory of string
     | Ls
@@ -27,23 +25,38 @@ let private parseLine (line: string) =
     | _ -> failwith $"Unrecognized line '{line}'"
 
 let create (input: string list): FileSystem =
-    let rec createInternal input currentDirectory : Directory =
+    let rec createItemTree (state: ItemTree) (input: Line list): ItemTree * Line list =
+        match state with
+        | ItemTree.File _ -> (state, input)
+        | ItemTree.Directory dir ->
+            let (dirName, subTrees) = dir
+            match input with
+            | [] -> (state, input)
+            | x::xs ->
+                let noop = createItemTree state xs
+                match x with
+                | CdParentDirectory -> (state, xs)
+                | Ls -> noop
+                | Dir _ -> noop
+                | File (name, size) -> createItemTree (Directory (dirName, (ItemTree.File (name, size) :: subTrees))) xs
+                | CdDirectory name ->
+                    let (itemTree, remainingInput) = createItemTree (ItemTree.Directory (name, [])) xs
+                    createItemTree (Directory (dirName, itemTree :: subTrees)) remainingInput
+
+    let rec createFileSystem (state: FileSystem) (input: Line list) =
+        let addItemTree startState xs =
+            let (ItemTree, remainingInput) = createItemTree startState xs
+            createFileSystem (ItemTree :: state) remainingInput
+
         match input with
-        | [] -> currentDirectory
+        | [] -> state
         | x::xs ->
-            let noop = createInternal xs currentDirectory
-            let file name size = Item.File { Name = name; Size = size }
-            let dir name xs = Directory (createInternal xs { Name = name; SubItems = [] })
-            // CdParentDirectory marks the end of exploring a directory
-            let skipSubdirLines xs = xs |> List.takeWhile (fun x -> match (parseLine x) with CdParentDirectory -> true | _ -> false) 
-            match parseLine x with
-            | CdParentDirectory -> noop
+            let noop = createFileSystem state xs
+            match x with
             | Ls -> noop
             | Dir _ -> noop
-            // Add file to current list of subitems and continue with remaining input
-            | File (name,size) -> createInternal xs { currentDirectory with SubItems = (file name size)::currentDirectory.SubItems }
-            // Recursively create and add a directory to current list of subitems and continue with remaining input, skipping lines already hit via recursion
-            | CdDirectory d -> createInternal (skipSubdirLines xs) { currentDirectory with SubItems = (dir d xs)::currentDirectory.SubItems }
+            | CdParentDirectory -> noop
+            | File (name, size) -> addItemTree (ItemTree.File (name, size)) xs
+            | CdDirectory name -> addItemTree (ItemTree.Directory (name, [])) xs
 
-    let rootDir = { Name = "/"; SubItems = [] }
-    FileSystem (createInternal (List.skip 1 input) rootDir)
+    createFileSystem [] (input |> List.map parseLine)
