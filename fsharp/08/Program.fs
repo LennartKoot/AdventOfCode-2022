@@ -17,11 +17,11 @@ let mapDirections fDirection fCombine edgeValue row column (matrix: int[,]) =
     | _,c when c = maxColumn -> edgeValue
     | _ ->
         let left (matrix:int[,]) =
-            matrix[row,0 .. column - 1] |> fDirection treeHeight
+            matrix[row,0 .. column - 1] |> Array.rev |> fDirection treeHeight
         let right (matrix:int[,]) =
             matrix[row,column + 1 .. maxColumn] |> fDirection treeHeight
         let top (matrix:int[,]) =
-            matrix[0 .. row - 1, column] |> fDirection treeHeight
+            matrix[0 .. row - 1, column] |> Array.rev |> fDirection treeHeight
         let bottom (matrix:int[,]) = 
             matrix[row + 1 .. maxRow, column] |> fDirection treeHeight
         
@@ -52,3 +52,25 @@ let partOne dataLocation =
 
 printfn "Part one (example): %A" <| partOne "data/example.txt"
 printfn "Part one (real): %A" <| partOne "data/input.txt"
+
+let calculateScenicScore =
+    let fDirection treeHeight trees = 
+        let visibleTrees = 
+            trees
+            |> Array.takeWhile ((>) treeHeight)
+            |> Array.length
+        if visibleTrees <> trees.Length
+        then visibleTrees + 1
+        else visibleTrees
+    let fCombine left right top bottom = left * right * top * bottom
+    mapDirections fDirection fCombine 0
+
+let partTwo dataLocation =
+    let matrix = forestMatrix dataLocation
+    matrix
+    |> Array2D.mapi (fun row column _ -> calculateScenicScore row column matrix)
+    |> fold (fun acc score -> score :: acc) []
+    |> Seq.max
+
+printfn "Part one (example): %A" <| partTwo "data/example.txt"
+printfn "Part one (real): %A" <| partTwo "data/input.txt"
