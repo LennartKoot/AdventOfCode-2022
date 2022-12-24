@@ -47,9 +47,9 @@ printfn "Part one (example): %A" <| (
     |> List.sum
 )
 
-// printfn "Part one (real): %A" <| ( 
-//     filesystem "data/input.txt" 
-//     |> determineDirectorySizes
-//     |> flattenAndFilterDirectories 100000
-//     |> List.sum
-// )
+printfn "Part one (real): %A" <| ( 
+    filesystem "data/input.txt" 
+    |> determineDirectorySizes
+    |> flattenAndFilterDirectories 100000
+    |> List.sum
+)

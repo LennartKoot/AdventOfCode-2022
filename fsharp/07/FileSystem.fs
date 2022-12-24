@@ -33,11 +33,11 @@ let create (input: string list): FileSystem =
             match input with
             | [] -> (state, input)
             | x::xs ->
-                let noop = createItemTree state xs
+                let noop () = createItemTree state xs
                 match x with
                 | CdParentDirectory -> (state, xs)
-                | Ls -> noop
-                | Dir _ -> noop
+                | Ls -> noop ()
+                | Dir _ -> noop ()
                 | File (name, size) -> createItemTree (Directory (dirName, (ItemTree.File (name, size) :: subTrees))) xs
                 | CdDirectory name ->
                     let (itemTree, remainingInput) = createItemTree (ItemTree.Directory (name, [])) xs
@@ -45,17 +45,17 @@ let create (input: string list): FileSystem =
 
     let rec createFileSystem (state: FileSystem) (input: Line list) =
         let addItemTree startState xs =
-            let (ItemTree, remainingInput) = createItemTree startState xs
-            createFileSystem (ItemTree :: state) remainingInput
+            let (itemTree, remainingInput) = createItemTree startState xs
+            createFileSystem (itemTree :: state) remainingInput
 
         match input with
         | [] -> state
-        | x::xs ->
-            let noop = createFileSystem state xs
+        | (x::xs) ->
+            let noop () = createFileSystem state xs
             match x with
-            | Ls -> noop
-            | Dir _ -> noop
-            | CdParentDirectory -> noop
+            | Ls -> noop ()
+            | Dir _ -> noop ()
+            | CdParentDirectory -> noop ()
             | File (name, size) -> addItemTree (ItemTree.File (name, size)) xs
             | CdDirectory name -> addItemTree (ItemTree.Directory (name, [])) xs
 
