@@ -72,5 +72,5 @@ let partTwo dataLocation =
     |> fold (fun acc score -> score :: acc) []
     |> Seq.max
 
-printfn "Part one (example): %A" <| partTwo "data/example.txt"
-printfn "Part one (real): %A" <| partTwo "data/input.txt"
+printfn "Part two (example): %A" <| partTwo "data/example.txt"
+printfn "Part two (real): %A" <| partTwo "data/input.txt"
