@@ -2,7 +2,7 @@ module MonkeyInTheMiddle.Expression
 
 type Value = 
     | Old
-    | Number of int
+    | Number of int64
 
 type Expression =
     | Add of Value * Value

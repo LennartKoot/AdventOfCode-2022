@@ -2,7 +2,7 @@ module MonkeyInTheMiddle.Monkey
 
 open Expression
 
-type WorryLevel = int
+type WorryLevel = int64
 type Item = Item of WorryLevel
 
 type Test = {
@@ -23,7 +23,7 @@ let parseMonkeys (lines: string array) =
     let parseStartingItems (line: string) =
         let prefix = "  Starting items: "
         line[prefix.Length..].Split(',')
-        |> Array.map (fun s -> s.Trim() |> int)
+        |> Array.map (fun s -> s.Trim() |> int64)
         |> Array.map Item
         |> List.ofArray
 
