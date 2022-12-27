@@ -1,4 +1,5 @@
 ﻿open CathodeRayTube.Input
+open System
 
 type Instruction =
     | Noop
@@ -33,3 +34,22 @@ let partOne dataLocation =
 
 printfn "Part one (example): %A" <| partOne "data/example.txt"
 printfn "Part one (real): %A" <| partOne "data/input.txt"
+
+let pixel i value =
+    if abs (value - i) <= 1
+    then '#'
+    else '.'
+
+let partTwo dataLocation =
+    instructions dataLocation
+    |> Seq.fold executeInstruction [1]
+    |> List.rev
+    |> Seq.chunkBySize 40
+    |> Seq.map (Array.mapi pixel >> String)
+    |> Seq.iter (printfn "%s")
+
+printfn "Part two (example)"
+partTwo "data/example.txt"
+
+printfn "Part two (real)"
+partTwo "data/input.txt"
