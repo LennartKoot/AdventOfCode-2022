@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Expression.fs" />
+    <Compile Include="Monkey.fs" />
+    <Compile Include="Input.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+</Project>
