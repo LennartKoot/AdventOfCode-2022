@@ -23,3 +23,12 @@ let partOne dataLocation =
 
 printfn "Part one (example): %A" <| partOne "data/example.txt"
 printfn "Part one (real): %A" <| partOne "data/input.txt"
+
+let partTwo dataLocation =
+    loadInput dataLocation
+    |> parseMotions
+    |> Seq.fold executeMotion (RopeBridge.Bridge.create 10)
+    |> (fun bridge -> bridge.Visited.Count)
+
+printfn "Part two (example): %A" <| partTwo "data/example2.txt"
+printfn "Part two (real): %A" <| partTwo "data/input.txt"
