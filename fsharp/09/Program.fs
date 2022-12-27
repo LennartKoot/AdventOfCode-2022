@@ -18,7 +18,7 @@ let parseMotions (input: string array) =
 let partOne dataLocation =
     loadInput dataLocation
     |> parseMotions
-    |> Seq.fold executeMotion RopeBridge.Bridge.create
+    |> Seq.fold executeMotion (RopeBridge.Bridge.create 2)
     |> (fun bridge -> bridge.Visited.Count)
 
 printfn "Part one (example): %A" <| partOne "data/example.txt"
