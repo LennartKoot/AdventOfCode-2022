@@ -53,8 +53,8 @@ namespace HillClimbing.MinPriorityQueue
                     match ts with
                     | t'::[] -> (t', [])
                     | t'::ts' ->
-                        let (t'', ts'') = getMin ts
-                        if root t' < root t'' then (t', ts') else (t'', t'::ts'')
+                        let (t'', ts'') = getMin ts'
+                        if root t' <= root t'' then (t', ts') else (t'', t'::ts'')
                     | _ -> failwith "Can't happen"
                 let (Node (x,r,c), ts) = getMin ts
                 meld (T (c |> List.rev)) (T ts)

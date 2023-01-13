@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="BinomialQueue.fsi" />
     <Compile Include="BinomialQueue.fs" />
+    <Compile Include="Dijkstra.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
