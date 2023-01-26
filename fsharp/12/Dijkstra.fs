@@ -15,6 +15,20 @@ namespace HillClimbing.Dijkstra
             graph |> Map.find id
         let getAllVertices (T graph) = graph |> Map.fold (fun acc _ (Node (vertex, _)) -> vertex :: acc) []
 
+        let reverse (T graph) = 
+            graph
+            |> Map.fold (fun (acc: Map<'TId,Node<'TId>>) _ (Node ((Vertex vertexId), neigbors)) ->
+                 neigbors
+                 |> List.fold (fun acc (Edge (id, weight)) ->
+                    let newVertex = Vertex id
+                    let newEdge = Edge (vertexId, weight)
+                    match Map.tryFind id acc with
+                    | None -> Map.add id (Node (newVertex, [newEdge])) acc
+                    | Some (Node (_, edges)) -> Map.add id (Node (newVertex, (newEdge :: edges))) acc
+                 ) acc
+            ) Map.empty
+            |> T
+
     module Algorithm =
         open Graph
         open HillClimbing.MinPriorityQueue
