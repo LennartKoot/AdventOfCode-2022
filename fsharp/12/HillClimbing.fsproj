@@ -5,6 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Input.fs" />
     <Compile Include="BinomialQueue.fsi" />
     <Compile Include="BinomialQueue.fs" />
     <Compile Include="Dijkstra.fs" />
