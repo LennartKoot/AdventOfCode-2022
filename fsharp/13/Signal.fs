@@ -12,7 +12,7 @@ let private listBetweenString sOpen sClose sSep pElement f =
     between (str sOpen) (str sClose)
         (sepBy pElement (str sSep)) |>> f
 
-let private ppacket, ppacketRef = createParserForwardedToRef<Packet, unit>()
+let private ppacket, private ppacketRef = createParserForwardedToRef<Packet, unit>()
 
 let private pnumber = pint32<unit> |>> PNumber
 let private plist = listBetweenString "[" "]" "," ppacket PList
@@ -24,5 +24,11 @@ let private psignal = many ppair
 
 let parse s =
     match run psignal s with
+    | Success(result, _, _) -> result
+    | Failure(error, _, _) -> failwith error
+
+let parsePackets s = 
+    let pAllPackets = many (ppacket .>> spaces)
+    match run pAllPackets s with
     | Success(result, _, _) -> result
     | Failure(error, _, _) -> failwith error
